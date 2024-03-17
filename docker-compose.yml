@@ -1,0 +1,43 @@
+version: "3.8"
+
+services:
+  prometheus:
+    image: quay.io/prometheus/prometheus:latest
+    volumes:
+      - ./prometheus:/etc/prometheus
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    ports:
+      - 9090:9090
+    extra_hosts:
+     - "mysqld-exporter:${NODE1_IP}"
+     - "node-exporter:${NODE1_IP}"
+     - "cadvisor:${NODE1_IP}"
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=grafana
+      - GF_SECURITY_ADMIN_PASSWORD=grafana
+      - GF_ALERTING_EXECUTE_ALERTS=false
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning/:/etc/grafana/provisioning/
+    ports:
+      - 3000:3000
+    links:
+      - prometheus
+    depends_on:
+      - prometheus
+
+networks:
+  default:
+    driver: bridge
+
+volumes:
+  prometheus_data: {}
+  grafana_data: {}
