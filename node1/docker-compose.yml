@@ -31,7 +31,7 @@ services:
     image: quay.io/prometheus/mysqld-exporter
     command:
      - --collect.info_schema.tablestats
-     - "--mysqld.username=wordpress:wordpress"
+     - "--mysqld.username=root:wordpress"
      - "--mysqld.address=db:3306"
     environment:
       - DATA_SOURCE_NAME=exporter:exporter@(mysqld:3306)/
